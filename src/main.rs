@@ -6,7 +6,7 @@ use tokio::process::Command;
 #[derive(Serialize, Deserialize)]
 struct PushData {
     pushed_at: usize,
-    pushed: String,
+    pusher: String,
     tag: String,
 }
 
@@ -31,13 +31,13 @@ struct Repository {
 #[derive(Serialize, Deserialize)]
 struct ExpectedPayload {
     callback_url: String,
-    push_data: Option<PushData>,
-    repository: Option<Repository>
+    // push_data: Option<PushData>,
+    // repository: Option<Repository>
 }
 
 #[tokio::main]
 async fn main() {
-
+    dotenvy::dotenv().expect("Couldn't read env variables from .env file");
     let ip_bind = std::env::var("BIND_URL").expect("Cannot find URL to bind server to");
     println!("{ip_bind}");
 
@@ -48,7 +48,7 @@ async fn main() {
     
 
     // run our app with hyper
-    let _ = axum::Server::bind(&"BIND_URL".parse().unwrap())
+    let _ = axum::Server::bind(&ip_bind.parse().expect("Invalid ip address"))
         .serve(app.into_make_service())
         .await;
 }
